@@ -47,9 +47,12 @@ class ColabCode:
         if self._mount and colab_env:
             drive.mount("/content/drive")
             if self._drive_name:
-                subprocess.run(["mkdir","-p", f"/content/{self._drive_name}"], stdout=subprocess.PIPE)
-                subprocess.run(["mount","--bind","/content/drive/My\ Drive",f"/content/{self._drive_name}"], stdout=subprocess.PIPE)
-
+                folder = subprocess.run(["mkdir","-p", f"/content/{self._drive_name}"], stdout=subprocess.PIPE)
+                if folder.stdout:
+                    print(folder.stdout)
+                mount = subprocess.run(["mount","--bind","/content/drive/My\ Drive",f"/content/{self._drive_name}"], stdout=subprocess.PIPE)
+                if mount:
+                    print(mount.stdout)
         if self.password:
             code_cmd = f"PASSWORD={self.password} code-server --port {self.port} --disable-telemetry"
         else:
