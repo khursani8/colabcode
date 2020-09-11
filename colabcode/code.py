@@ -34,11 +34,15 @@ class ColabCode:
             subprocess.run(["code-server", "--install-extension", f"{ext}"])
 
     def _start_server(self):
-        active_tunnels = ngrok.get_tunnels()
-        for tunnel in active_tunnels:
-            public_url = tunnel.public_url
-            ngrok.disconnect(public_url)
-        url = ngrok.connect(port=self.port)
+        if colab_env:
+            from google.colab.output import eval_js
+            url = eval_js(f"google.colab.kernel.proxyPort({self.port})")
+        else:
+            active_tunnels = ngrok.get_tunnels()
+            for tunnel in active_tunnels:
+                public_url = tunnel.public_url
+                ngrok.disconnect(public_url)
+            url = ngrok.connect(port=self.port)
         print(f"Code Server can be accessed on: {url}")
 
     def _run_code(self):
