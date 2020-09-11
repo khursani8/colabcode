@@ -35,15 +35,17 @@ class ColabCode:
 
     def _start_server(self):
         if colab_env:
-            from google.colab.output import eval_js
-            url = eval_js(f"google.colab.kernel.proxyPort({self.port})")
+            from google.colab import output
+            output.serve_kernel_port_as_window(self.port)
+            # from google.colab.output import eval_js
+            # url = eval_js(f"google.colab.kernel.proxyPort({self.port})")
         else:
             active_tunnels = ngrok.get_tunnels()
             for tunnel in active_tunnels:
                 public_url = tunnel.public_url
                 ngrok.disconnect(public_url)
             url = ngrok.connect(port=self.port)
-        print(f"Code Server can be accessed on: {url}")
+            print(f"Code Server can be accessed on: {url}")
 
     def _run_code(self):
         os.system(f"fuser -n tcp -k {self.port}")
